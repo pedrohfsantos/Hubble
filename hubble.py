@@ -2,6 +2,7 @@ from Class import *
 import threading
 import schedule
 import time
+import datetime
 
 
 def verifica():
@@ -103,5 +104,9 @@ schedule.every().day.at("16:00").do(verifica)
 
 
 while 1:
-    schedule.run_pending()
+    try:
+        schedule.run_pending()
+    except:
+        print(f"Erro {datetime.datetime.now()}")
+
     time.sleep(1)
