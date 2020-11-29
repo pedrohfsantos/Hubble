@@ -21,6 +21,7 @@ Pontos validados:
 ```bash
 pip install tqdm
 pip install requests_html
+pip install schedule
 ```
 
 ## Como usar o Script
