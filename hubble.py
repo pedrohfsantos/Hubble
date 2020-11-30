@@ -31,8 +31,8 @@ def verifica():
     resultadosSSL = {
         "Sites com SSL": [],
         "Sites sem SSL": [],
-        "Sites  sem redirect HTTPS": [],
-        "Site com redirect para outra url": [],
+        "Sites sem redirect HTTPS": [],
+        "Site com redirect para outro url": [],
     }
 
     dns = DNS(
@@ -45,8 +45,8 @@ def verifica():
     ssl = SSL(
         resultadosSSL["Sites com SSL"],
         resultadosSSL["Sites sem SSL"],
-        resultadosSSL["Sites  sem redirect HTTPS"],
-        resultadosSSL["Site com redirect para outra url"],
+        resultadosSSL["Sites sem redirect HTTPS"],
+        resultadosSSL["Site com redirect para outro url"],
     )
 
     analytics = Analytics(
@@ -61,6 +61,8 @@ def verifica():
         resultadosSitemap["Sitemap nao foi encontrado"],
         resultadosSitemap["Sitemap com numeros de links abaixo do esperado"],
     )
+
+    email = Email("" "")  # E-mail Gmail ex:exemplo@gmail.com  # Senha
 
     # Verifica DNS dos projetos
     sites = arquivo.ler_arquivo("Config", "dominios")
@@ -96,6 +98,28 @@ def verifica():
 
     threadSitemap.join()
     arquivo.arquivo_resultado("Resultados/Sitemap", resultadosSitemap)
+
+    mensagem = """
+    E-mail enviado pelo script python que monitora os sites no ar.
+    Segue anexo dos erros encontrados
+    """
+
+    anexos = [
+        "Resultados/SSL/Sites sem SSL.txt",
+        "Resultados/SSL/Sites sem redirect HTTPS.txt",
+        "Resultados/SSL/Site com redirect para outro url.txt",
+        "Resultados/Analytics/Site com problemas no ID do analytics.txt",
+        "Resultados/Redirect/Site com problemas no redirect 404.txt",
+        "Resultados/Sitemap/Sitemap nao foi encontrado.txt",
+        "Resultados/Sitemap/Sitemap com numeros de links abaixo do esperado.txt",
+    ]
+
+    email.send(
+        destinatario="",
+        assunto="Relatorio status site (SCRIPT  PYTHON)",
+        mensagem=mensagem,
+        anexos=anexos,
+    )
 
 
 schedule.every().day.at("08:00").do(verifica)
