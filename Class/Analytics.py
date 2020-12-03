@@ -16,7 +16,7 @@ class Analytics:
                 r = self.session.get(self.url_http(url))
                 body = r.html.find("body", first=True)
                 idAnalytics = re.search(
-                    "(gtag|ga)\(['\"]create['\"].*?['\"]([a-zA-Z]*-\d*-\d*)['\"].*?\)",
+                    "(gtag|ga)\(['\"](create|config)['\"].*?['\"](.*?-.*?)['\"].*?\)",
                     body.text,
                 ).group(2)
 
