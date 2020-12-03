@@ -12,15 +12,16 @@ class Email:
         self.email = email
         self.password = password
 
-    def send(self, destinatario, assunto, mensagem, anexos=False):
+    def send(self, destinatario, assunto, mensagem, anexos=False, erro=False):
         msg = MIMEMultipart()
         msg["From"] = self.email
         msg["To"] = destinatario
         msg["Subject"] = assunto
         msg.attach(MIMEText(mensagem, "plain"))
 
+        arquivoAnexo = False
+
         if anexos != False:
-            arquivoAnexo = False
             for anexo in anexos:
                 if os.path.isfile(anexo):
                     filename = anexo.split("/")[-1]
@@ -35,10 +36,11 @@ class Email:
                     msg.attach(part)
                     arquivoAnexo = True
 
-        if arquivoAnexo:
+        if arquivoAnexo or erro:
             server = smtplib.SMTP("smtp.gmail.com", 587)
             server.starttls()
             server.login(self.email, self.password)
             corpoEmail = msg.as_string()
             server.sendmail(self.email, destinatario, corpoEmail)
-            server.quit()
+        
+        server.quit()

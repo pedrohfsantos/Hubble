@@ -5,6 +5,8 @@ import time
 import datetime
 
 
+email = Email("EMAIL@GMAIL.COM", "SENHA")
+
 def verifica():
     arquivo = Arquivo()
     ip = arquivo.ler_arquivo("Config", "ips")
@@ -62,8 +64,7 @@ def verifica():
         resultadosSitemap["Sitemap com numeros de links abaixo do esperado"],
     )
 
-    email = Email("" "")  # E-mail Gmail ex:exemplo@gmail.com  # Senha
-
+     
     # Verifica DNS dos projetos
     sites = arquivo.ler_arquivo("Config", "dominios")
     dns.ip(sites)
@@ -116,21 +117,28 @@ def verifica():
 
     email.send(
         destinatario="",
-        assunto="Relatorio status site (SCRIPT  PYTHON)",
+        assunto=f"{datetime.datetime.now().strftime('%d/%m/%Y')} - Relatorio status site (SCRIPT  PYTHON)",
         mensagem=mensagem,
         anexos=anexos,
     )
 
+    arquivo.clear_resultados()
+
 
 schedule.every().day.at("08:00").do(verifica)
-schedule.every().day.at("12:00").do(verifica)
-schedule.every().day.at("16:00").do(verifica)
 
 
 while 1:
     try:
         schedule.run_pending()
     except:
-        print(f"Erro {datetime.datetime.now()}")
-
+        email.send(
+            destinatario="",
+            assunto=f"{datetime.datetime.now().strftime('%d/%m/%Y')} - ERRO (SCRIPT  PYTHON)",
+            mensagem="Erro na verificação, o script foi desligado.",
+            erro=True,
+        )
+        break
+    
+            
     time.sleep(1)

@@ -1,5 +1,6 @@
 from os import listdir, makedirs
 import os.path
+import shutil
 
 
 class Arquivo:
@@ -34,3 +35,7 @@ class Arquivo:
 
         documento.close()
         return arrayLinhas
+
+
+    def clear_resultados(self):
+        shutil.rmtree('Resultados')
