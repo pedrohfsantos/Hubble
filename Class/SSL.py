@@ -37,10 +37,10 @@ class SSL:
 
     def url_https(self, url):
         url = url.split(",")
-        url = "https://www." + url[0] + "/"
+        url = "https://" + url[0] + "/"
         return url
 
     def url_http(self, url):
         url = url.split(",")
-        url = "http://www." + url[0] + "/"
+        url = "http://" + url[0] + "/"
         return url

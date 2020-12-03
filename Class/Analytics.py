@@ -30,5 +30,5 @@ class Analytics:
 
     def url_http(self, url):
         url = url.split(",")
-        url = "http://www." + url[0] + "/"
+        url = "http://" + url[0] + "/"
         return url
