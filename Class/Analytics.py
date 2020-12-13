@@ -1,34 +1,22 @@
-from requests_html import HTMLSession
+from urllib.request import urlopen
 from tqdm.auto import tqdm
 import re
-
 
 class Analytics:
     def __init__(self, erroidAnalytics):
         self.erroidAnalytics = erroidAnalytics
-        self.session = HTMLSession()
 
     def verifica(self, urls):
-        for url in tqdm(
-            urls, unit="Projetos", desc="Verificando ID do Analytics", leave=False
-        ):
+        for url in tqdm(urls, unit="Projetos", desc="Verificando ID do Analytics", leave=False,):
+            url = self.dominio(url)
             try:
-                r = self.session.get(self.url_http(url))
-                body = r.html.find("body", first=True)
-                idAnalytics = re.search(
-                    "(gtag|ga)\(['\"](create|config)['\"].*?['\"](.*?-.*?)['\"].*?\)",
-                    body.text,
-                ).group(2)
-
+                home = urlopen("http://" + url + "/")
+                idAnalytics = re.search("(gtag|ga)\(\\\['\"](create|config)\\\['\"].*?\\\['\"](.*?-.*?)\\\['\"].*?\)", str(home.read()),).group(2)
+                            
             except:
-                self.erroidAnalytics.append(self.dominio(url))
+                self.erroidAnalytics.append(url)
 
     def dominio(self, url):
         url = url.split(",")
         url = url[0]
-        return url
-
-    def url_http(self, url):
-        url = url.split(",")
-        url = "http://" + url[0] + "/"
         return url

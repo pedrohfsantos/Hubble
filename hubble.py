@@ -15,6 +15,14 @@ def verifica():
         "Casa": [],
         "Fora da cada": [],
         "Congelado": [],
+        "IP Host diferente do WWW": [],
+    }
+
+    resultadosSSL = {
+        "Sites com SSL": [],
+        "Sites sem SSL": [],
+        "SSL expira em 7 dias": [],
+        "Sites sem redirect HTTPS": []
     }
 
     resultadosAnalytics = {
@@ -30,25 +38,19 @@ def verifica():
         "Sitemap com numeros de links abaixo do esperado": [],
     }
 
-    resultadosSSL = {
-        "Sites com SSL": [],
-        "Sites sem SSL": [],
-        "Sites sem redirect HTTPS": [],
-        "Site com redirect para outro url": [],
-    }
-
     dns = DNS(
         ip,
         resultadosDNS["Casa"],
         resultadosDNS["Fora da cada"],
         resultadosDNS["Congelado"],
+        resultadosDNS["IP Host diferente do WWW"],
     )
 
     ssl = SSL(
         resultadosSSL["Sites com SSL"],
         resultadosSSL["Sites sem SSL"],
+        resultadosSSL["SSL expira em 7 dias"],
         resultadosSSL["Sites sem redirect HTTPS"],
-        resultadosSSL["Site com redirect para outro url"],
     )
 
     analytics = Analytics(
@@ -108,7 +110,8 @@ def verifica():
     anexos = [
         "Resultados/SSL/Sites sem SSL.txt",
         "Resultados/SSL/Sites sem redirect HTTPS.txt",
-        "Resultados/SSL/Site com redirect para outro url.txt",
+        "Resultados/SSL/SSL expira em 7 dias.txt",
+        "Resultados/DNS/IP Host diferente do WWW.txt",
         "Resultados/Analytics/Site com problemas no ID do analytics.txt",
         "Resultados/Redirect/Site com problemas no redirect 404.txt",
         "Resultados/Sitemap/Sitemap nao foi encontrado.txt",
@@ -125,6 +128,8 @@ def verifica():
     arquivo.clear_resultados()
 
 
+verifica()
+
 schedule.every().day.at("08:00").do(verifica)
 
 
@@ -140,5 +145,4 @@ while 1:
         )
         break
     
-            
     time.sleep(1)

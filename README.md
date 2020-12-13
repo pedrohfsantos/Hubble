@@ -12,7 +12,7 @@ Pontos validados:
 
 ## Configuração e preparação do ambiente
 
-* Instale o Python na sua máquina. [importante]
+* Instale o Python >= 3.6 na sua máquina. [importante]
 * Siga o passo-passo abaixo, e instale todas as bibliotecas utilizando o comando "pip install" no cmd.
 
 
@@ -20,7 +20,6 @@ Pontos validados:
 
 ```bash
 pip install tqdm
-pip install requests_html
 pip install schedule
 ```
 

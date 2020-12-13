@@ -1,35 +1,40 @@
-from requests_html import HTMLSession
+from urllib.request import urlopen
+from lxml import etree
 from tqdm.auto import tqdm
-import re
-
 
 class Sitemap:
     def __init__(self, erroSitemap, erroSitemapTamanho):
         self.erroSitemap = erroSitemap
         self.erroSitemapTamanho = erroSitemapTamanho
-        self.session = HTMLSession()
 
     def verifica(self, urls):
         for url in tqdm(urls, unit="Projetos", desc="Verificando Sitemap", leave=False):
-            try:
-                r = self.session.get(self.url_http(url) + "mapa-site")
-                linksMapaSite = r.html.xpath('//*[@class="sitemap"]//li//a/@href')
+            url = self.dominio(url)
 
-                r = self.session.get(self.url_http(url) + "sitemap.xml")
-                linksSitemap = r.html.xpath("//loc/text()")
+            try:
+                ms = urlopen("http://" + url + "/mapa-site")
+                msXML = urlopen("http://" + url + "/sitemap.xml")
+
+                if "/404" in msXML.url:
+                    self.erroSitemap.append(url)
+
+                html = etree.HTML(ms.read())
+                linksMapaSite = html.xpath('//*[@class="sitemap"]//li//a/@href')
+
+                html = etree.HTML(msXML.read())
+                linksSitemap = html.xpath("//loc/text()")
 
                 if len(linksMapaSite) > len(linksSitemap):
-                    self.erroSitemapTamanho.append(self.dominio(url))
+                    self.erroSitemapTamanho.append(url)
 
+                ms.close()
+                msXML.close()
+            
             except:
-                self.erroSitemap.append(self.dominio(url))
+                self.erroSitemap.append(url)
 
     def dominio(self, url):
         url = url.split(",")
         url = url[0]
         return url
 
-    def url_http(self, url):
-        url = url.split(",")
-        url = "http://" + url[0] + "/"
-        return url

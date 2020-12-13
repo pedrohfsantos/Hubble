@@ -1,46 +1,45 @@
-from requests_html import HTMLSession
+import json
+from urllib.request import ssl, socket, urlopen
+from datetime import datetime
 from tqdm.auto import tqdm
 
 
 class SSL:
-    def __init__(self, ssl, erroSSL, sslSemRedirect, redirectSite):
+    def __init__(self, ssl, erroSSL, expira, redirectHTTPS):
         self.ssl = ssl
         self.erroSSL = erroSSL
-        self.sslSemRedirect = sslSemRedirect
-        self.redirectSite = redirectSite
-        self.session = HTMLSession()
-
+        self.expira = expira
+        self.redirectHTTPS = redirectHTTPS
+        
     def verifica(self, urls):
-        for url in tqdm(
-            urls,
-            unit="Projetos",
-            desc="Verificando SSL e Redirect para HTTPS",
-            leave=False,
-        ):
+        for url in tqdm(urls, unit="Projetos", desc="Verificando SSL e Redirect para HTTPS", leave=False,):
+            url = self.dominio(url)
+            port = '443'
+            context = ssl.create_default_context()
+            
             try:
-                r = self.session.get(self.url_https(url))
-                self.ssl.append(self.dominio(url))
-                try:
-                    location = self.session.head(self.url_http(url)).headers["Location"]
-                    if self.dominio(url) not in location:
-                        self.redirectSite.append(self.dominio(url))
-                except:
-                    self.sslSemRedirect.append(self.dominio(url))
+                with socket.create_connection((url, port)) as sock:
+                    with context.wrap_socket(sock, server_hostname=url) as ssock:
+                        self.ssl.append(url)
+                        
+                        data = json.dumps(ssock.getpeercert())
+                        data = json.loads(data)
+                        
+                        inicio = datetime.strptime(data['notAfter'], "%b %d %H:%M:%S %Y %Z")
+                        termino = datetime.strptime(data['notBefore'], "%b %d %H:%M:%S %Y %Z")
+                        dSSL = inicio - termino
+
+                        if dSSL.days <= 7:
+                            self.expira.append(f"{url} - SSL expira em {dSSL.days} dias")
+
+                        with urlopen("http://" + url + "/") as sssock:
+                            if "https:" not in sssock.url:
+                                self.redirectHTTPS.append(url)
 
             except:
-                self.erroSSL.append(self.dominio(url))
+                self.erroSSL.append(url)
 
     def dominio(self, url):
         url = url.split(",")
         url = url[0]
-        return url
-
-    def url_https(self, url):
-        url = url.split(",")
-        url = "https://" + url[0] + "/"
-        return url
-
-    def url_http(self, url):
-        url = url.split(",")
-        url = "http://" + url[0] + "/"
         return url
