@@ -2,19 +2,23 @@ from os import listdir, makedirs
 import os.path
 import shutil
 
+import datetime
+
 
 class Arquivo:
     def __init__(self):
         pastas = ["DNS", "Analytics", "SSL", "Redirect", "Sitemap"]
+        data_arquivo = datetime.datetime.now().strftime("%d-%m-%Y")
 
         if not os.path.isdir("Resultados"):
             makedirs("Resultados")
-            for pasta in pastas:
-                makedirs(f"Resultados/{pasta}")
+
+        if not os.path.isdir(f"Resultados/{data_arquivo}"):
+            makedirs(f"Resultados/{data_arquivo}")
 
         for pasta in pastas:
-            if not os.path.isdir(f"Resultados/{pasta}"):
-                makedirs(f"Resultados/{pasta}")
+            if not os.path.isdir(f"Resultados/{data_arquivo}/{pasta}"):
+                makedirs(f"Resultados/{data_arquivo}/{pasta}")
 
     def arquivo_resultado(self, caminho, resultados):
         for resultado in resultados:
@@ -35,7 +39,3 @@ class Arquivo:
 
         documento.close()
         return arrayLinhas
-
-
-    def clear_resultados(self):
-        shutil.rmtree('Resultados')

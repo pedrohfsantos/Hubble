@@ -1,40 +1,33 @@
-from urllib.request import urlopen
-from lxml import etree
+from requests_html import HTMLSession
 from tqdm.auto import tqdm
 
+
 class Sitemap:
-    def __init__(self, erroSitemap, erroSitemapTamanho):
-        self.erroSitemap = erroSitemap
-        self.erroSitemapTamanho = erroSitemapTamanho
+    def __init__(self, erro_sitemap, erro_sitemap_tamanho):
+        self.erro_sitemap = erro_sitemap
+        self.erro_sitemap_tamanho = erro_sitemap_tamanho
+        self.session = HTMLSession()
 
     def verifica(self, urls):
         for url in tqdm(urls, unit="Projetos", desc="Verificando Sitemap", leave=False):
-            url = self.dominio(url)
-
             try:
-                ms = urlopen("http://" + url + "/mapa-site")
-                msXML = urlopen("http://" + url + "/sitemap.xml")
+                mapa_site = self.session.get("http://" + self.dominio(url) + "/mapa-site")
+                sitemap = self.session.get("http://" + self.dominio(url) + "/sitemap.xml")
 
-                if "/404" in msXML.url:
-                    self.erroSitemap.append(url)
+                if sitemap.url.endswith("/404"):
+                    self.erro_sitemap.append(url)
 
-                html = etree.HTML(ms.read())
-                linksMapaSite = html.xpath('//*[@class="sitemap"]//li//a/@href')
+                else:
+                    links_mapa_site = mapa_site.html.xpath('//*[@class="sitemap"]//li//a/@href')
+                    links_sitemap = sitemap.html.xpath("//loc/text()")
 
-                html = etree.HTML(msXML.read())
-                linksSitemap = html.xpath("//loc/text()")
+                    if len(links_mapa_site) > len(links_sitemap):
+                        self.erro_sitemap_tamanho.append(url)
 
-                if len(linksMapaSite) > len(linksSitemap):
-                    self.erroSitemapTamanho.append(url)
-
-                ms.close()
-                msXML.close()
-            
             except:
-                self.erroSitemap.append(url)
+                self.erro_sitemap.append(url)
 
     def dominio(self, url):
-        url = url.split(",")
+        url = url.split(" => ")
         url = url[0]
         return url
-
